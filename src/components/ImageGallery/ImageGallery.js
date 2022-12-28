@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { API_KEY, params } from 'servises/api';
@@ -8,28 +8,26 @@ import { Loader } from '../Loader/Loader';
 import { Button } from '../Button/Button';
 import { Gallery } from './ImageGallery.styled';
 
-export class ImageGallery extends Component {
-  state = {
-    images: [],
-    total: 0,
-    isLoading: false,
-  };
+export function ImageGallery({ nameQuery, page, addPage }) {
+  const [images, setImages] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
-  async componentDidUpdate(prevProps, _) {
-    const { nameQuery, page } = this.props;
-
-    if (prevProps.nameQuery !== nameQuery) {
-      this.setState({
-        images: [],
-      });
+  useEffect(() => {
+    if (!nameQuery) {
+      return;
     }
-    if (prevProps.nameQuery !== nameQuery || prevProps.page !== page) {
+
+    async function geImages() {
       try {
-        this.setState({ isLoading: true });
+        setIsLoading(true);
         const urlSearh = `?${API_KEY}&q=${nameQuery}&page=${page}`;
+
         const {
           data: { hits, total },
         } = await axios.get(urlSearh, { params });
+
+        console.log('hits: ', hits);
         if (total > 0 && hits.length > 0) {
           if (page === 1) {
             notify(
@@ -39,11 +37,8 @@ export class ImageGallery extends Component {
             notify(`Завантажую ще ${hits.length} зображень із ${total}.`);
           }
         }
-
-        this.setState(prevState => ({
-          images: [...prevState.images, ...hits],
-          total: total,
-        }));
+        setImages([...images, ...hits]);
+        setTotal(total);
         if (total === 0) {
           notify('За вашим запитом нічого не знайдено, спробуйте знову');
         }
@@ -51,28 +46,26 @@ export class ImageGallery extends Component {
         console.error(error);
         notify(error.message);
       } finally {
-        this.setState({ isLoading: false });
+        setIsLoading(false);
       }
     }
-  }
+    geImages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nameQuery, page]);
 
-  render() {
-    const { images, isLoading, total } = this.state;
-
-    return (
-      <>
-        <Gallery>
-          {images.map(image => (
-            <ImageGalleryItem key={image.id} image={image} />
-          ))}
-        </Gallery>
-        {isLoading && <Loader />}
-        {Boolean(
-          (images.length % params.per_page === 0) & (total > params.per_page)
-        ) && <Button addPage={this.props.addPage} />}
-      </>
-    );
-  }
+  return (
+    <>
+      <Gallery>
+        {images.map(image => (
+          <ImageGalleryItem key={image.id} image={image} />
+        ))}
+      </Gallery>
+      {isLoading && <Loader />}
+      {Boolean(
+        (images.length % params.per_page === 0) & (total > params.per_page)
+      ) && <Button addPage={addPage} />}
+    </>
+  );
 }
 
 ImageGallery.propTypes = {
