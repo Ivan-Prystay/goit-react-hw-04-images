@@ -1,4 +1,3 @@
-import { Component } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -6,36 +5,25 @@ import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 
 import { Container } from './App.styled';
-export class App extends Component {
-  state = {
-    nameQuery: '',
-    page: 1,
+import { useState } from 'react';
+export function App() {
+  const [nameQuery, setNameQuery] = useState('');
+  const [page, setPage] = useState(1);
+
+  const handelSearshForm = nameQuery => {
+    setPage(1);
+    setNameQuery(nameQuery);
   };
 
-  handelSearshForm = nameQuery => {
-    this.setState({ nameQuery, page: 1 });
+  const addPage = () => {
+    setPage(page + 1);
   };
 
-  addPage = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
-  };
-
-  render() {
-    return (
-      <Container>
-        <Searchbar
-          getQuery={this.handelSearshForm}
-          nameQuery={this.state.nameQuery}
-        />
-        <ImageGallery
-          nameQuery={this.state.nameQuery}
-          page={this.state.page}
-          addPage={this.addPage}
-        />
-        <ToastContainer />
-      </Container>
-    );
-  }
+  return (
+    <Container>
+      <Searchbar getQuery={handelSearshForm} nameQuery={nameQuery} />
+      <ImageGallery nameQuery={nameQuery} page={page} addPage={addPage} />
+      <ToastContainer />
+    </Container>
+  );
 }

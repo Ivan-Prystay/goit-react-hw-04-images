@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
+import { useState } from 'react';
 
-import { Component } from 'react';
 import { notify } from 'servises/notify';
 
 import {
@@ -11,22 +11,15 @@ import {
   SearchFormInput,
 } from './Searchbar.styled';
 
-export class Searchbar extends Component {
-  state = {
-    serchQuery: '',
+export function Searchbar({ nameQuery, getQuery }) {
+  const [serchQuery, setSerchQuery] = useState('');
+
+  const handleChange = event => {
+    setSerchQuery(event.currentTarget.value);
   };
 
-  handleChange = event => {
-    const { name, value } = event.currentTarget;
-    this.setState({
-      [name]: value,
-    });
-  };
-
-  handleSubmit = event => {
+  const handleSubmit = event => {
     event.preventDefault();
-    const { serchQuery } = this.state;
-    const { nameQuery, getQuery } = this.props;
 
     if (serchQuery.trim() === '') {
       notify('Введіть свій запит');
@@ -35,35 +28,33 @@ export class Searchbar extends Component {
 
     if (nameQuery.toLowerCase().trim() === serchQuery.toLowerCase().trim()) {
       notify('У вашому запиті нічого не змінилось');
-      this.setState({ serchQuery: '' });
+      setSerchQuery('');
       return;
     }
 
     getQuery(serchQuery);
-    this.setState({ serchQuery: '' });
+    setSerchQuery('');
   };
 
-  render() {
-    return (
-      <SearchbarHeader>
-        <SearchForm onSubmit={this.handleSubmit}>
-          <SearchFormButton type="submit">
-            🔎
-            <ButtonLabel>Search</ButtonLabel>
-          </SearchFormButton>
-          <SearchFormInput
-            name="serchQuery"
-            type="text"
-            autoComplete="off"
-            autoFocus
-            placeholder="Search images and photos"
-            value={this.state.serchQuery}
-            onChange={this.handleChange}
-          />
-        </SearchForm>
-      </SearchbarHeader>
-    );
-  }
+  return (
+    <SearchbarHeader>
+      <SearchForm onSubmit={handleSubmit}>
+        <SearchFormButton type="submit">
+          🔎
+          <ButtonLabel>Search</ButtonLabel>
+        </SearchFormButton>
+        <SearchFormInput
+          name="serchQuery"
+          type="text"
+          autoComplete="off"
+          autoFocus
+          placeholder="Search images and photos"
+          value={serchQuery}
+          onChange={handleChange}
+        />
+      </SearchForm>
+    </SearchbarHeader>
+  );
 }
 
 Searchbar.propTypes = {
