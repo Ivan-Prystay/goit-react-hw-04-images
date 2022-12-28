@@ -31,9 +31,13 @@ export class ImageGallery extends Component {
           data: { hits, total },
         } = await axios.get(urlSearh, { params });
         if (total > 0 && hits.length > 0) {
-          notify(
-            `За вашим запитом всього знайдено ${total} зображень, завантажую ${hits.length} зображень.`
-          );
+          if (page === 1) {
+            notify(
+              `За вашим запитом всього знайдено ${total} зображень, завантажую ${hits.length} зображень.`
+            );
+          } else {
+            notify(`Завантажую ще ${hits.length} зображень із ${total}.`);
+          }
         }
 
         this.setState(prevState => ({
