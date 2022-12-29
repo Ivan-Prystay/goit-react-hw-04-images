@@ -36,7 +36,11 @@ export function ImageGallery({ nameQuery, page, addPage }) {
             notify(`Завантажую останні ${hits.length} зображень.`);
             setImages([...images, ...hits]);
           } else {
-            notify(`Завантажую ще ${hits.length} зображень із ${total}.`);
+            notify(
+              `Завантажую ще ${hits.length} зображень із ${
+                total - images.length
+              }, що залишились.`
+            );
             setImages([...images, ...hits]);
           }
         }
