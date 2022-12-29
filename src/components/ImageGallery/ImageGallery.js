@@ -17,30 +17,32 @@ export function ImageGallery({ nameQuery, page, addPage }) {
     if (!nameQuery) {
       return;
     }
-
+    geImages();
     async function geImages() {
       try {
         setIsLoading(true);
         const urlSearh = `?${API_KEY}&q=${nameQuery}&page=${page}`;
-
         const {
           data: { hits, total },
         } = await axios.get(urlSearh, { params });
 
-        console.log('hits: ', hits);
         if (total > 0 && hits.length > 0) {
           if (page === 1) {
             notify(
               `За вашим запитом всього знайдено ${total} зображень, завантажую ${hits.length} зображень.`
             );
+            setImages(hits);
+          } else if (hits.length < params.per_page) {
+            notify(`Завантажую останні ${hits.length} зображень.`);
+            setImages([...images, ...hits]);
           } else {
             notify(`Завантажую ще ${hits.length} зображень із ${total}.`);
+            setImages([...images, ...hits]);
           }
         }
-        setImages([...images, ...hits]);
         setTotal(total);
         if (total === 0) {
-          notify('За вашим запитом нічого не знайдено, спробуйте знову');
+          notify('За вашим запитом нічого не знайдено, спробуйте знову.');
         }
       } catch (error) {
         console.error(error);
@@ -49,7 +51,6 @@ export function ImageGallery({ nameQuery, page, addPage }) {
         setIsLoading(false);
       }
     }
-    geImages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nameQuery, page]);
 

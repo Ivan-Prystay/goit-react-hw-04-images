@@ -22,12 +22,12 @@ export function Searchbar({ nameQuery, getQuery }) {
     event.preventDefault();
 
     if (serchQuery.trim() === '') {
-      notify('Введіть свій запит');
+      notify('Введіть свій запит.');
       return;
     }
 
     if (nameQuery.toLowerCase().trim() === serchQuery.toLowerCase().trim()) {
-      notify('У вашому запиті нічого не змінилось');
+      notify('У вашому запиті нічого не змінилось.');
       setSerchQuery('');
       return;
     }
